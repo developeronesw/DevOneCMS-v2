@@ -1,37 +1,51 @@
-# Getting Started with DevOne Development
+# Getting Started with DevOne CMS 2.0 Development
+
+DevOne CMS 2.0 is a TypeScript application with provider-independent Core APIs and a first-class Extension API.
 
 ## Choose the right extension
 
 | Type | Use it for |
 |---|---|
-| Theme | Front-end design and templates |
+| Theme | Front-end design, templates, assets, and presentation |
 | Plugin | A focused behavior or integration |
-| Module | A complete feature area with routes, admin pages, assets, and lifecycle |
-| Library | Reusable compiled CSS or JavaScript |
+| Module | A larger feature area with routes, admin UI, data, and lifecycle |
+| Library | Reusable front-end CSS, JavaScript, or other static dependencies |
+| App | A packaged application that composes documented Core capabilities |
 
-## Official API
+## Core API
 
-```php
-$settings = DevOne::settings();
-$assets = DevOne::assets();
-$mail = DevOne::mail();
-$user = DevOne::users()->current();
+Start with [CORE-API.md](./CORE-API.md). Extensions should call Core contracts rather than accessing SQLite, D1, R2, filesystem paths, or runtime-specific bindings directly.
+
+Example:
+
+```ts
+import { createCoreApi } from "../core/api";
+
+const api = createCoreApi({
+  db,
+  cache,
+  media,
+  config,
+});
 ```
 
-Dynamic access is also supported:
+For HTTP extensions, register routes through the documented API route contract and enforce authentication, permissions, and CSRF requirements for mutations.
 
-```php
-$cache = devone_service('cache');
-$db = devone_services()->get('db');
-```
+## Extension API
 
-Legacy helpers remain supported, but new development should prefer Core Services.
+Read [EXTENSION-API.md](./EXTENSION-API.md) before creating a package. It defines the What, Where, When, and Why of DevOne extensions and identifies which package-loader capabilities are implemented versus planned.
 
-## Minimum security pattern
+## Security baseline
 
-```php
-DevOne::auth()->requirePermission('manage_pages');
-DevOne::auth()->requireCsrf();
-$title = trim((string)($_POST['title'] ?? ''));
-echo e($title);
-```
+- Validate extension manifests before loading them.
+- Use the narrowest permission required for every protected action.
+- Enforce CSRF protection on authenticated browser mutations.
+- Never expose secrets in manifests, client bundles, logs, or package metadata.
+- Never bypass Core provider abstractions for persistent storage.
+- Treat package paths, URLs, MIME types, and external input as untrusted.
+- Keep extension settings namespaced by extension ID.
+- Do not execute arbitrary source as part of package installation.
+
+## Compatibility
+
+Target the documented 2.0 API only. Legacy PHP APIs and 1.x runtime behavior are outside the 2.0 compatibility boundary.
