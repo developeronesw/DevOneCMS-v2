@@ -1,51 +1,54 @@
-# Plugins
+# DevOne CMS 2.0 Plugins
 
-A plugin adds focused behavior to DevOne.
+Plugins add focused behavior without modifying Core.
 
+## 1. Good plugin candidates
+SEO, forms, integrations, content enhancements, admin utilities, custom API routes, and other focused capabilities.
+
+## 2. 2.0 package structure
 ```text
 acme-seo/
 ├── plugin.json
-├── plugin.php
-├── lifecycle/          optional, recommended for optimized plugins
-├── admin/
-├── includes/
-└── assets/
+├── src/
+│   ├── index.ts
+│   ├── routes.ts
+│   └── settings.ts
+├── assets/
+├── migrations/
+├── README.md
+├── CHANGELOG.md
+└── LICENSE
 ```
+Legacy PHP plugin entry files are not part of DevOne CMS 2.0.
 
-```php
-<?php
-DevOne::events()->filter('page_title', function ($title) {
-    return $title . ' | Acme';
-});
-```
-
-Use vendor-prefixed hooks, functions, classes, routes, and custom services.
-
-## Runtime performance (Core 1.7+)
-
-See `RUNTIME-LOADER.md`. Existing package structure remains supported. New plugins should use the optimized runtime and lifecycle manifest fields.
-
-Keep `plugin.php` lightweight. Put schema creation and repair in lifecycle actions. Use frontend/admin/route/shortcode/API/background runtime contexts to load heavy components only where they are required.
-
-## Admin Runtime (Core 1.7.1+)
-
-Do not opt a plugin into lazy admin loading until all of its admin integration points are declared. A plugin that only owns its own admin pages can use:
-
+## 3. Manifest
 ```json
-"runtime": {
-  "mode": "optimized",
-  "admin_mode": "lazy"
+{
+  "name": "Acme SEO",
+  "slug": "acme-seo",
+  "version": "1.0.0",
+  "type": "plugin",
+  "main": "src/index.ts",
+  "author": "Acme",
+  "requires": { "devone": "2.0.0" }
 }
 ```
+The exact package-loader validation rules will be finalized with the 2.0 package manager; do not invent unsupported fields.
 
-A plugin that also extends Core pages must declare those page slugs:
+## 4. API routes
+Use the Core router and a unique namespace. See CORE-API.md for request lifecycle, authentication, permission, CSRF, and response rules.
 
-```json
-"runtime": {
-  "mode": "optimized",
-  "admin_mode": "lazy",
-  "admin_pages": ["pages", "media"]
-}
-```
+## 5. Data
+Plugin data must be isolated by plugin namespace and site ID where applicable. Use Core's database provider and parameterized SQL.
 
-Then use `DevOne::runtime()->admin(...)` to include page-specific heavy code. Global admin behavior should stay lightweight.
+## 6. Events
+Use only documented Core extension points. If a required event is missing, add the public contract before depending on it.
+
+## 7. Lifecycle
+Plan install, activate, update, deactivate, and uninstall. Migrations should be versioned, retry-safe, and non-destructive by default.
+
+## 8. Security checklist
+Verify route permissions, CSRF, validation, SQL parameters, upload restrictions, HTML escaping, debug logging, secrets, uninstall, and upgrades.
+
+## 9. Migration rule
+Do not copy legacy 1.x PHP plugin examples into 2.0. The 2.0 architecture is TypeScript-based and provider-independent.
