@@ -19,6 +19,7 @@
   "d1_databases": [
     {
       "binding": "DB",
+      "database_name": "devone-cms-db",
       "migrations_dir": "./migrations"
     }
   ],
