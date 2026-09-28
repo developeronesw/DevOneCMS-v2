@@ -33,7 +33,7 @@ async function api(request: Request, env: Env): Promise<Response> {
         { id: "r2", label: "Cloudflare R2 media bucket", required: true, ok: Boolean(env.MEDIA), detail: "Required for media storage." },
         { id: "kv", label: "Cloudflare KV cache", required: true, ok: Boolean(env.CACHE), detail: "Required for cache and runtime state." },
         { id: "email", label: "Cloudflare Email Service", required: true, ok: Boolean(env.EMAIL), detail: "Required for outbound email on the Cloudflare runtime." },
-        { id: "secret", label: "DEVONE_SECRET_KEY", required: true, ok: Boolean(env.DEVONE_SECRET_KEY), detail: "Required to encrypt stored secrets." },
+        { id: "secret", label: "DEVONE_SECRET_KEY", required: false, ok: true, detail: "Optional until encrypted SMTP credentials or other encrypted secrets are configured." },
         { id: "worker", label: "Cloudflare Worker runtime", required: true, ok: true, detail: "The installer is running inside the deployed Cloudflare Worker." },
       ],
     });
