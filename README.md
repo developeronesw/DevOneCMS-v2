@@ -2,17 +2,35 @@
 
 DevOne CMS 2.0 is the next-generation proprietary, self-hosted DevOne CMS distribution by Developer One.
 
-## Current status
+## Architecture
 
 - Version: 2.0.0-alpha.3
-- Architecture: TypeScript core with local and Cloudflare Workers runtimes
-- Base installation: single-site
-- Commercial Network License: unlocks Network/Multi-Site functionality for one activated Installation with unlimited Sites
-- Licensing Server: planned for post-2.0.0 implementation as a separate Cloudflare serverless service
+- **PHP-free:** the v2 runtime contains no PHP requirement.
+- Local runtime: TypeScript/Node.js with the provider-independent core.
+- Cloudflare runtime: Cloudflare Workers + Vite.
+- Cloudflare resources are provisioned by the deployment configuration: D1, KV, R2, Worker Assets, and Email Service.
+- Each installation owns its own Cloudflare resources and secrets. Developer One credentials are not shipped in the CMS package.
+- Base installation: single-site.
+- Commercial Network License: unlocks Network/Multi-Site functionality for one activated Installation with unlimited Sites.
 
-## License
+## Cloudflare deployment
 
-DevOne CMS 2.0 is proprietary software. It is licensed, not sold.
+Deployments use the Wrangler configuration in `wrangler.jsonc`. D1, KV, and R2 bindings are declared without customer-specific IDs so the deployment can provision resources in the customer's Cloudflare account. The installer then verifies the bindings before completing CMS initialization.
+
+Required runtime resources:
+- D1: `DB`
+- KV: `CACHE`
+- R2: `MEDIA`
+- Worker Assets: `ASSETS`
+- Email Service: `EMAIL`
+
+Customer-specific secrets must be configured in the customer's Cloudflare environment and must never be committed to this repository or distributed in a DevOne CMS ZIP.
+
+## Authentication
+
+Password hashing uses PBKDF2-SHA-256 with **10,000 iterations** so fresh Cloudflare Workers Free installations stay within the CPU budget that blocked the previous 210,000-iteration implementation. Stored hashes with iteration counts from 10,000 through 2,000,000 remain verifiable, and successful logins transparently rehash older passwords to the current 10,000-iteration cost.
+
+## Licensing
 
 The base CMS may be installed and used for one Site without a paid Network activation. Network/Multi-Site functionality requires a valid commercial Network entitlement.
 
