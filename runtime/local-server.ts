@@ -1,3 +1,4 @@
+import { serveFrontend } from "./static-assets";
 import { createServer } from "node:http";
 import { createLocalRuntime } from "../adapters/local/runtime";
 import { createCoreApi } from "../core/api";
@@ -13,7 +14,7 @@ const services = await createLocalRuntime({
   mediaDir: process.env.DEVONE_MEDIA_DIR,
   environment: process.env.NODE_ENV ?? "development",
 });
-const auth = new DevOneAuthService(services.db, { secureCookies: false });
+const auth = new DevOneAuthService(services.db, { secureCookies: process.env.DEVONE_SECURE_COOKIES !== "false" && process.env.NODE_ENV === "production" });
 const permissions = new DevOnePermissions(services.db);
 let mail: DevOneMailService;
 const mailTransport = new LocalSmtpTransport(async () => mail.config());
@@ -78,7 +79,8 @@ async function handle(request: Request): Promise<Response> {
     const migrations = await services.db.all("SELECT name, applied_at FROM devone_migrations ORDER BY name");
     return json({ ok: true, runtime: services.config.runtime, migrations });
   }
-  return json({ ok: false, error: "API route not found." }, 404);
+  if (path === "/api" || path.startsWith("/api/")) return json({ ok: false, error: "API route not found." }, 404);
+  return serveFrontend(request);
 }
 const server = createServer(async (req, res) => {
   try {
@@ -103,6 +105,9 @@ const server = createServer(async (req, res) => {
       body: chunks.length && req.method !== "GET" && req.method !== "HEAD" ? Buffer.concat(chunks) : undefined,
     });
     const response = await handle(request);
+    response.headers.set("x-content-type-options", "nosniff");
+    response.headers.set("x-frame-options", "SAMEORIGIN");
+    response.headers.set("referrer-policy", "strict-origin-when-cross-origin");
     res.writeHead(response.status, Object.fromEntries(response.headers.entries()));
     res.end(response.body ? Buffer.from(await response.arrayBuffer()) : undefined);
   } catch (error) {

@@ -32,6 +32,9 @@ test("local runtime auth flow survives session restore and logout", async () => 
     stdio: ["ignore", "pipe", "pipe"],
   });
 
+  let logs = "";
+  child.stderr?.on("data", chunk => { logs += chunk; });
+  child.once("exit", () => { if (child.exitCode) console.error(logs); });
   let cookie = "";
   try {
     await waitForServer(baseUrl, child);
@@ -56,7 +59,7 @@ test("local runtime auth flow survives session restore and logout", async () => 
         smtp: { enabled: false, host: "", port: 587, encryption: "starttls", username: "", password: "", fromEmail: "admin@example.test", fromName: "Runtime Test Site" },
       }),
     });
-    assert.equal(install.status, 201, await install.text());
+    assert.equal(install.status, 201, await install.clone().text());
 
     const installed = await fetch(baseUrl + "/api/install/status");
     assert.equal((await installed.json()).installed, true);
@@ -69,7 +72,7 @@ test("local runtime auth flow survives session restore and logout", async () => 
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ username: "ADMIN", password: "correct horse battery staple" }),
     });
-    assert.equal(login.status, 200, await login.text());
+    assert.equal(login.status, 200, await login.clone().text());
     const loginBody = await login.json() as { ok: boolean; csrf_token: string; user: { username: string } };
     assert.equal(loginBody.ok, true);
     assert.equal(loginBody.user.username, "admin");
