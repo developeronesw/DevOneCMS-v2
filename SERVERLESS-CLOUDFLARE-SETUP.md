@@ -13,12 +13,22 @@ The Wrangler configuration intentionally declares the bindings without resource 
 From the repository root:
 
 ```bash
-npm install
+npm ci
 npx wrangler login
 npm run cloudflare:deploy
 ```
 
-That's the entire Cloudflare setup flow.
+The deployment command builds and deploys the Worker, then applies the D1 SQL
+migrations. Resource provisioning alone does not create CMS tables. If migration
+application fails, resolve the error and rerun `npm run cloudflare:migrate` before
+opening the installer. When changing `database_name` in `wrangler.jsonc`, update
+the migration script in `package.json` to match.
+
+This repository does not currently configure a Pages deployment. Use Workers +
+Static Assets. Node self-hosting has its own `npm run build:local` build.
+
+Protect a fresh deployment with account access controls until the administrator
+has completed setup. Each installation must use its own Worker/resource names.
 
 On first deployment Wrangler provisions:
 

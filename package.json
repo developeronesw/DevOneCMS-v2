@@ -2,19 +2,22 @@
   "name": "devone-cms",
   "version": "2.0.0-alpha.3",
   "private": true,
-  "description": "DevOne CMS — Performance, Security, Design",
+  "description": "DevOne CMS \u2014 Performance, Security, Design",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "check": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.worker.json --noEmit",
-    "local": "tsx runtime/local-server.ts",
-    "cloudflare:deploy": "vite build && wrangler deploy",
+    "local": "node --import tsx runtime/local-server.ts",
+    "cloudflare:deploy": "vite build && wrangler deploy && npm run cloudflare:migrate",
     "cloudflare:dev": "wrangler dev",
     "cloudflare:typegen": "wrangler types",
-    "test": "tsx --test tests/**/*.test.ts",
-    "test:core": "tsx --test tests/core.test.ts"
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:core": "node --import tsx --test tests/core.test.ts",
+    "start": "node --env-file-if-exists=.env --import tsx runtime/local-server.ts",
+    "build:local": "vite build --mode selfhost",
+    "cloudflare:migrate": "wrangler d1 migrations apply devone-cms-db --remote"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.60.1",
@@ -31,5 +34,8 @@
     "wrangler": "^4.131.2",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9"
+  },
+  "engines": {
+    "node": ">=24 <25"
   }
 }

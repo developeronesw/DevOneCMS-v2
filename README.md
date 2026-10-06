@@ -13,6 +13,12 @@ DevOne CMS 2.0 is the next-generation proprietary, self-hosted DevOne CMS distri
 - Base installation: single-site.
 - Commercial Network License: unlocks Network/Multi-Site functionality for one activated Installation with unlimited Sites.
 
+## Command-line self-hosting
+
+Use Node.js 24. See [the local installation guide](runtime/README.md) for the
+root/sudo Linux installer, CloudPanel reverse proxy setup, and a local test flow.
+The Node runtime serves the UI and API from the site root.
+
 ## Cloudflare deployment
 
 Deployments use the Wrangler configuration in `wrangler.jsonc`. D1, KV, and R2 bindings are declared without customer-specific IDs so the deployment can provision resources in the customer's Cloudflare account. The installer then verifies the bindings before completing CMS initialization.
