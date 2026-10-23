@@ -45,7 +45,7 @@ export class DevOneInstaller {
     const existingUser = await this.services.db.first<{ id: number }>("SELECT id FROM users LIMIT 1");
     if (existingUser) throw new Error("An administrator already exists.");
 
-    const hashedPassword = await passwordHash(input.admin.password);
+    const hashedPassword = await passwordHash(input.admin.password,Number(this.services.config.password_hash_iterations??10000));
     let smtpPasswordEncrypted = "";
     if (input.smtp?.enabled && input.smtp.password) {
       const secret = String(this.services.config.secret_key ?? "");
@@ -63,7 +63,7 @@ export class DevOneInstaller {
       ["site_url", input.site.url ?? ""],
       ["timezone", input.site.timezone ?? "UTC"],
       ["language", input.site.language ?? "en-US"],
-      ["cms_version", "2.0.0-alpha.3"],
+      ["cms_version", "2.0.0-alpha.4"],
       ["site_theme", "devone-glass"],
       ["smtp_enabled", smtp.enabled ? "1" : "0"],
       ["smtp_host", smtp.host ?? ""],

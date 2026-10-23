@@ -2,9 +2,9 @@ name: DevOne CMS 2.0
 
 on:
   push:
-    branches: [serverless-2.0]
+    branches: [main, serverless-2.0]
   pull_request:
-    branches: [serverless-2.0]
+    branches: [main, serverless-2.0]
 
 jobs:
   core:
@@ -14,7 +14,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: npm install
+      - run: npm ci --ignore-scripts
       - run: npm run check
-      - run: npm run test:core
+      - run: npm test
       - run: npm run build
+      - run: npm run build:local
+      - run: npm run test:local-package
+      - run: git diff --check
+      - run: python3 scripts/package-local.py /tmp/devone-cms-local.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: devone-cms-local-preview
+          path: /tmp/devone-cms-local.tar.gz

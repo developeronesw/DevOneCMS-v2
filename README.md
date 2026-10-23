@@ -4,7 +4,7 @@ DevOne CMS 2.0 is the next-generation proprietary, self-hosted DevOne CMS distri
 
 ## Architecture
 
-- Version: 2.0.0-alpha.3
+- Version: 2.0.0-alpha.4
 - **PHP-free:** the v2 runtime contains no PHP requirement.
 - Local runtime: TypeScript/Node.js with the provider-independent core.
 - Cloudflare runtime: Cloudflare Workers + Vite.
@@ -28,7 +28,7 @@ Customer-specific secrets must be configured in the customer's Cloudflare enviro
 
 ## Authentication
 
-Password hashing uses PBKDF2-SHA-256 with **10,000 iterations** so fresh Cloudflare Workers Free installations stay within the CPU budget that blocked the previous 210,000-iteration implementation. Stored hashes with iteration counts from 10,000 through 2,000,000 remain verifiable, and successful logins transparently rehash older passwords to the current 10,000-iteration cost.
+Password hashing uses PBKDF2-SHA-256 with **10,000 iterations** so fresh Cloudflare Workers Free installations stay within the CPU budget that blocked the previous 210,000-iteration implementation. Local production packages use a separate 600,000-iteration policy; see runtime/README.md. Stored hashes with iteration counts from 10,000 through 2,000,000 remain verifiable, and successful logins transparently rehash older passwords to the current 10,000-iteration cost.
 
 ## Licensing
 

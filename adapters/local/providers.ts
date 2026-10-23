@@ -100,6 +100,7 @@ export function createLocalServices(options: LocalRuntimeOptions & { secretKey?:
     media: new LocalMedia(options.mediaDir!),
     config: {
       runtime: "local",
+      password_hash_iterations: options.environment === "production" ? 600000 : 10000,
       environment: options.environment ?? "development",
       media_dir: options.mediaDir,
       secret_key: options.secretKey ?? "",

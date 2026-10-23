@@ -56,7 +56,7 @@ test("local runtime auth flow survives session restore and logout", async () => 
         smtp: { enabled: false, host: "", port: 587, encryption: "starttls", username: "", password: "", fromEmail: "admin@example.test", fromName: "Runtime Test Site" },
       }),
     });
-    assert.equal(install.status, 201, await install.text());
+    assert.equal(install.status, 201, await install.clone().text());
 
     const installed = await fetch(baseUrl + "/api/install/status");
     assert.equal((await installed.json()).installed, true);
@@ -69,7 +69,7 @@ test("local runtime auth flow survives session restore and logout", async () => 
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ username: "ADMIN", password: "correct horse battery staple" }),
     });
-    assert.equal(login.status, 200, await login.text());
+    assert.equal(login.status, 200, await login.clone().text());
     const loginBody = await login.json() as { ok: boolean; csrf_token: string; user: { username: string } };
     assert.equal(loginBody.ok, true);
     assert.equal(loginBody.user.username, "admin");
@@ -86,7 +86,7 @@ test("local runtime auth flow survives session restore and logout", async () => 
       headers: { cookie, "content-type": "application/json", "x-devone-csrf": csrfAfterLogin },
       body: JSON.stringify({ site_settings: { site_tagline: "Phase 5 verified", timezone: "UTC", language: "en-US" } }),
     });
-    assert.equal(settingsUpdate.status, 200, await settingsUpdate.text());
+    assert.equal(settingsUpdate.status, 200, await settingsUpdate.clone().text());
 
     const settingsAfter = await fetch(baseUrl + "/api/core/settings", { headers: { cookie } });
     assert.equal(settingsAfter.status, 200);
@@ -113,7 +113,7 @@ test("local runtime auth flow survives session restore and logout", async () => 
       headers: { "content-type": "application/json", cookie, "x-devone-csrf": restoredBody.csrf_token },
       body: "{}",
     });
-    assert.equal(logout.status, 200, await logout.text());
+    assert.equal(logout.status, 200, await logout.clone().text());
     assert.match(logout.headers.get("set-cookie") ?? "", /Max-Age=0/);
 
     const afterLogout = await fetch(baseUrl + "/api/auth/me", { headers: { cookie } });
