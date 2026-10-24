@@ -103,7 +103,7 @@ async function handle(request: Request): Promise<Response> {
   const authResponse = await routeAuth(request, path);
   if (authResponse) return authResponse;
   if (path.startsWith("/api/core/") || path.startsWith("/api/install")) return core.api.handle(request);
-  if (path === "/api/health" && request.method === "GET") return json({ ok: true, product: "DevOne CMS", version: "2.0.0-alpha.4", runtime: "local", database: "sqlite", media: "filesystem", cache: "memory" });
+  if (path === "/api/health" && request.method === "GET") return json({ ok: true, product: "DevOne CMS", version: "2.0.0-alpha.5", runtime: "local", database: "sqlite", media: "filesystem", cache: "memory" });
   if (path === "/api/runtime/status" && request.method === "GET") {
     if(production&&!await auth.getCurrentUser(request))return json({ok:false,error:"Authentication required."},401);
     const migrations = await services.db.all("SELECT name, applied_at FROM devone_migrations ORDER BY name");

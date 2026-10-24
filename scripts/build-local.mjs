@@ -6,4 +6,4 @@ for(const [entry,out] of [['runtime/local-server.ts','runtime.mjs'],['runtime/ma
 execFileSync(process.execPath,['node_modules/vite/bin/vite.js','build','--config','vite.local.config.ts'],{stdio:'inherit'});
 await cp('migrations','dist-local/migrations',{recursive:true});
 for(const file of ['DEVONE-CMS-2.0-LICENSE.md','NOTICE.txt'])await cp(file,'dist-local/'+file);
-await writeFile('dist-local/release.json',JSON.stringify({product:'DevOne CMS',version:'2.0.0-alpha.4',sourceRepository:'developeronesw/DevOneCMS-v2',sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),profile:'local-node-sqlite',preview:true},null,2)+'\n');
+await writeFile('dist-local/release.json',JSON.stringify({product:'DevOne CMS',version:'2.0.0-alpha.5',sourceRepository:'developeronesw/DevOneCMS-v2',sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),profile:'local-node-sqlite',preview:true},null,2)+'\n');

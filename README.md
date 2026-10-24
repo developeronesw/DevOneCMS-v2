@@ -4,7 +4,7 @@ DevOne CMS 2.0 is the next-generation proprietary, self-hosted DevOne CMS distri
 
 ## Architecture
 
-- Version: 2.0.0-alpha.4
+- Version: 2.0.0-alpha.5
 - **PHP-free:** the v2 runtime contains no PHP requirement.
 - Local runtime: TypeScript/Node.js with the provider-independent core.
 - Cloudflare runtime: Cloudflare Workers + Vite.
