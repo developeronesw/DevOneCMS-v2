@@ -2,6 +2,14 @@ import type { LicenseEntitlement, LicenseFeature, LicenseProvider, LicenseServic
 
 const DEFAULT_SINGLE_SITE_LIMIT = 1;
 
+/** Network features must fail closed for missing, expired, or invalid entitlements. */
+function hasActiveNetworkEntitlement(entitlement: LicenseEntitlement | null): entitlement is LicenseEntitlement {
+  if (!entitlement || entitlement.edition !== "network") return false;
+  if (entitlement.expiresAt === null) return true;
+  const expiry = Date.parse(entitlement.expiresAt);
+  return Number.isFinite(expiry) && expiry > Date.now();
+}
+
 export class DevOneLicense implements LicenseService {
   constructor(private readonly provider: LicenseProvider) {}
 
@@ -11,18 +19,12 @@ export class DevOneLicense implements LicenseService {
 
   async isFeatureEnabled(feature: LicenseFeature): Promise<boolean> {
     const entitlement = await this.get();
-    return Boolean(entitlement?.features.includes(feature));
+    return hasActiveNetworkEntitlement(entitlement) && entitlement.features.includes(feature);
   }
 
   async canCreateSite(currentSiteCount: number): Promise<boolean> {
     const entitlement = await this.get();
-    if (!entitlement) return currentSiteCount < DEFAULT_SINGLE_SITE_LIMIT;
-
-    if (entitlement.expiresAt && Date.parse(entitlement.expiresAt) <= Date.now()) {
-      return currentSiteCount < DEFAULT_SINGLE_SITE_LIMIT;
-    }
-
-    if (entitlement.edition !== "network") {
+    if (!hasActiveNetworkEntitlement(entitlement)) {
       return currentSiteCount < DEFAULT_SINGLE_SITE_LIMIT;
     }
 
